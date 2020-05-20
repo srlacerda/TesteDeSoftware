@@ -10,7 +10,7 @@ namespace Demo.Tests
         [Fact]
         public void Calculadora_Somar_RetornarValorSoma()
         {
-            // Arrangee
+            // Arrange
             var calculadora = new Calculadora();
 
             // Act
