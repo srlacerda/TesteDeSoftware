@@ -24,7 +24,8 @@ namespace Features.Clientes
                 return;
 
             _clienteRepository.Adicionar(cliente);
-            _mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, cliente.GetHashCode().ToString(), "cliente atualizado"));
+            //_mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, cliente.GetHashCode().ToString(), "cliente atualizado"));
+            _mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, "Olá", "Bem vindo!"));
         }
 
         public void Atualizar(Cliente cliente)
@@ -33,7 +34,8 @@ namespace Features.Clientes
                 return;
 
             _clienteRepository.Atualizar(cliente);
-            _mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, cliente.GetHashCode().ToString(), "cliente atualizado"));
+            //_mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, cliente.GetHashCode().ToString(), "cliente atualizado"));
+            _mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, "Mudanças", "Dê uma olhada!"));
         }
 
         public void Inativar(Cliente cliente)
@@ -43,13 +45,15 @@ namespace Features.Clientes
 
             cliente.Inativar();
             _clienteRepository.Atualizar(cliente);
-            _mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, cliente.GetHashCode().ToString(), "cliente inativo"));
+            //_mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, cliente.GetHashCode().ToString(), "cliente inativo"));
+            _mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, "Até breve", "Até mais tarde!"));
         }
 
         public void Remover(Cliente cliente)
         {
             _clienteRepository.Remover(cliente.Id);
-            _mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, cliente.GetHashCode().ToString(), "cliente removido"));
+            //_mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, cliente.GetHashCode().ToString(), "cliente removido"));
+            _mediator.Publish(new ClienteEmailNotification("admin@me.com", cliente.Email, "Adeus", "Tenha uma boa jornada!"));
         }
         public void Dispose()
         {
