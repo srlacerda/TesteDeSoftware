@@ -1,41 +1,45 @@
-﻿using FluentValidation.Results;
-using NerdStore.Core.DomainObjects;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
+using FluentValidation.Results;
+using NerdStore.Core.DomainObjects;
 
 namespace NerdStore.Vendas.Domain
 {
-    public class Pedido: Entity, IAggregateRoot
+    public class Pedido : Entity, IAggregateRoot
     {
+        // ReSharper disable once InconsistentNaming
         public static int MAX_UNIDADES_ITEM => 15;
         public static int MIN_UNIDADES_ITEM => 1;
+
+        public int Codigo { get; private set; }
+        public Guid ClienteId { get; private set; }
+        public Guid? VoucherId { get; private set; }
+        public decimal ValorTotal { get; private set; }
+        public PedidoStatus PedidoStatus { get; private set; }
+        public decimal Desconto { get; private set; }
+        public DateTime DataCadastro { get; private set; }
+        public bool VoucherUtilizado { get; private set; }
+        public Voucher Voucher { get; private set; }
+
+        private readonly List<PedidoItem> _pedidoItems;
+        public IReadOnlyCollection<PedidoItem> PedidoItems => _pedidoItems;
+
         protected Pedido()
         {
             _pedidoItems = new List<PedidoItem>();
         }
-        public Guid ClienteId { get; private set;}
-        public PedidoStatus PedidoStatus { get; private set; }
-        public decimal ValorTotal { get; private set; }
-        public decimal Desconto { get; private set; }
-        public bool VoucherUtilizado { get; private set; }
-        public Voucher Voucher { get; private set; }
-        private readonly List<PedidoItem> _pedidoItems;
-        public IReadOnlyCollection<PedidoItem> PedidoItems => _pedidoItems;
 
         public ValidationResult AplicarVoucher(Voucher voucher)
         {
-            var result = voucher.ValidarSeAplicavel();
-            if (!result.IsValid) return result;
+            var validationResult = voucher.ValidarSeAplicavel();
+            if (!validationResult.IsValid) return validationResult;
 
             Voucher = voucher;
             VoucherUtilizado = true;
+            CalcularValorPedido();
 
-            CalcularValorTotalDesconto();
-
-            return result;
+            return validationResult;
         }
 
         public void CalcularValorTotalDesconto()
@@ -45,7 +49,15 @@ namespace NerdStore.Vendas.Domain
             decimal desconto = 0;
             var valor = ValorTotal;
 
-            if (Voucher.TipoDescontoVoucher == TipoDescontoVoucher.Valor)
+            if (Voucher.TipoDescontoVoucher == TipoDescontoVoucher.Porcentagem)
+            {
+                if (Voucher.PercentualDesconto.HasValue)
+                {
+                    desconto = (valor * Voucher.PercentualDesconto.Value) / 100;
+                    valor -= desconto;
+                }
+            }
+            else
             {
                 if (Voucher.ValorDesconto.HasValue)
                 {
@@ -53,21 +65,14 @@ namespace NerdStore.Vendas.Domain
                     valor -= desconto;
                 }
             }
-            else
-            {
-                if (Voucher.PercentualDesconto.HasValue)
-                {
-                    desconto = (ValorTotal * Voucher.PercentualDesconto.Value) / 100;
-                    valor -= desconto;
-                }
-            }
 
             ValorTotal = valor < 0 ? 0 : valor;
             Desconto = desconto;
         }
-        private void CalcularValorPedido()
+
+        public void CalcularValorPedido()
         {
-            ValorTotal = PedidoItems.Sum(i => i.CalcularValor());
+            ValorTotal = PedidoItems.Sum(p => p.CalcularValor());
             CalcularValorTotalDesconto();
         }
 
@@ -93,44 +98,51 @@ namespace NerdStore.Vendas.Domain
             if (quantidadeItems > MAX_UNIDADES_ITEM) throw new DomainException($"Máximo de {MAX_UNIDADES_ITEM} unidades por produto.");
         }
 
-        public void AdicionarItem(PedidoItem pedidoItem)
+        public void AdicionarItem(PedidoItem item)
         {
-            ValidarQuantidadeItemPermitida(pedidoItem);
+            ValidarQuantidadeItemPermitida(item);
 
-            if (PedidoItemExistente(pedidoItem))
+            item.AssociarPedido(Id);
+
+            if (PedidoItemExistente(item))
             {
-                var itemExistente = _pedidoItems.FirstOrDefault(p => p.ProdutoId == pedidoItem.ProdutoId);
-
-                itemExistente.AdicionarUnidades(pedidoItem.Quantidade);
-                pedidoItem = itemExistente;
+                var itemExistente = _pedidoItems.FirstOrDefault(p => p.ProdutoId == item.ProdutoId);
+                itemExistente.AdicionarUnidades(item.Quantidade);
+                item = itemExistente;
 
                 _pedidoItems.Remove(itemExistente);
             }
 
-            _pedidoItems.Add(pedidoItem);
+            _pedidoItems.Add(item);
             CalcularValorPedido();
         }
 
-        public void AtualizarItem(PedidoItem pedidoItem)
+        public void RemoverItem(PedidoItem item)
         {
-            ValidarPedidoItemInexistente(pedidoItem);
-            ValidarQuantidadeItemPermitida(pedidoItem);
+            ValidarPedidoItemInexistente(item);
 
-            var itemExistente = PedidoItems.FirstOrDefault(p => p.ProdutoId == pedidoItem.ProdutoId);
+            _pedidoItems.Remove(item);
+            CalcularValorPedido();
+        }
+
+        public void AtualizarItem(PedidoItem item)
+        {
+            ValidarQuantidadeItemPermitida(item);
+            ValidarPedidoItemInexistente(item);
+            item.AssociarPedido(Id);
+
+            var itemExistente = PedidoItems.FirstOrDefault(p => p.ProdutoId == item.ProdutoId);
 
             _pedidoItems.Remove(itemExistente);
-            _pedidoItems.Add(pedidoItem);
+            _pedidoItems.Add(item);
 
             CalcularValorPedido();
         }
 
-        public void RemoverItem(PedidoItem pedidoItem)
+        public void AtualizarUnidades(PedidoItem item, int unidades)
         {
-            ValidarPedidoItemInexistente(pedidoItem);
-
-            _pedidoItems.Remove(pedidoItem);
-
-            CalcularValorPedido();
+            item.AtualizarUnidades(unidades);
+            AtualizarItem(item);
         }
 
         public void TornarRascunho()
