@@ -43,6 +43,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NerdStore.Catalogo.Applicat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NerdStore.WebApp.MVC", "03 - Testes de Integracao\src\NerdStore.WebApp.MVC\NerdStore.WebApp.MVC.csproj", "{6CF6CDBB-9D83-4AF8-B63A-A67D1F64B11E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration Tests", "Integration Tests", "{858954A2-CF0A-47EA-B015-0EFCB495B2D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NerdStore.WebApp.Tests", "03 - Testes de Integracao\tests\NerdStore.WebApp.Tests\NerdStore.WebApp.Tests.csproj", "{EFA29D84-5C3F-4BC9-8268-B3167D1DF826}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +109,10 @@ Global
 		{6CF6CDBB-9D83-4AF8-B63A-A67D1F64B11E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CF6CDBB-9D83-4AF8-B63A-A67D1F64B11E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CF6CDBB-9D83-4AF8-B63A-A67D1F64B11E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFA29D84-5C3F-4BC9-8268-B3167D1DF826}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFA29D84-5C3F-4BC9-8268-B3167D1DF826}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFA29D84-5C3F-4BC9-8268-B3167D1DF826}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFA29D84-5C3F-4BC9-8268-B3167D1DF826}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -127,6 +135,8 @@ Global
 		{F61189C7-EB16-418E-88DD-8626D3CDF859} = {34DA1D97-2873-43A1-9ADF-5C8E6E4E6181}
 		{64FCDDD0-C763-4AD9-925E-812A4F87DBE0} = {34DA1D97-2873-43A1-9ADF-5C8E6E4E6181}
 		{6CF6CDBB-9D83-4AF8-B63A-A67D1F64B11E} = {34DA1D97-2873-43A1-9ADF-5C8E6E4E6181}
+		{858954A2-CF0A-47EA-B015-0EFCB495B2D2} = {34DA1D97-2873-43A1-9ADF-5C8E6E4E6181}
+		{EFA29D84-5C3F-4BC9-8268-B3167D1DF826} = {858954A2-CF0A-47EA-B015-0EFCB495B2D2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5DDC0309-0882-4F4D-8BAE-844E402348A1}
