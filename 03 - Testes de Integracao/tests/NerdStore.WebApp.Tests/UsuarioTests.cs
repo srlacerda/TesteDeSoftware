@@ -19,18 +19,22 @@ namespace NerdStore.WebApp.Tests
         
         [Fact(DisplayName = "Realizar cadastro com sucesso")]
         [Trait("Categoria","Integração Web Usuário")]
-        public async Task Usuario_RealziarCadastro_DeveExecutarComSucesso()
+        public async Task Usuario_RealizarCadastro_DeveExecutarComSucesso()
         {
             // Arrange
             var initialResponse = await _testFixture.Client.GetAsync(requestUri: "Identity/Account/Register");
             initialResponse.EnsureSuccessStatusCode();
 
-            var email = "teste2@teste.com";
+            var antiForgeryToken = _testFixture.ObterAntiForgeryToken(await initialResponse.Content.ReadAsStringAsync());
+
+            _testFixture.GerarUserSenha();
+
             var formData = new Dictionary<string, string>
             {
-                {"Input.Email", email},
-                {"Input.Passord","Teste@123"},
-                {"Input.ConfirmPassord","Teste@123"},
+                {_testFixture.AntiForgeryFieldName, antiForgeryToken},
+                {"Input.Email", _testFixture.UsuarioEmail},
+                {"Input.Password",_testFixture.UsuarioSenha},
+                {"Input.ConfirmPassword",_testFixture.UsuarioSenha},
             };
 
             var postRequest = new HttpRequestMessage(HttpMethod.Post, "Identity/Account/Register")
@@ -45,7 +49,7 @@ namespace NerdStore.WebApp.Tests
             var responseString = await postResponse.Content.ReadAsStringAsync();
 
             postResponse.EnsureSuccessStatusCode();
-            Assert.Contains(expectedSubstring: $"Hello {email}", responseString);
+            Assert.Contains(expectedSubstring: $"Hello {_testFixture.UsuarioEmail}", responseString);
 
         }
     }
