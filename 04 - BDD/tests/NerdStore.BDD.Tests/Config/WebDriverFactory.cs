@@ -25,9 +25,12 @@ namespace NerdStore.BDD.Tests.Config
                     break;
                 case Browser.Chrome:
                     var options = new ChromeOptions();
+                    //--ignore-certificate-errors
+                    options.AddArgument("--ignore-certificate-errors");
+
                     if (headless)
                         options.AddArgument("--headless");
-
+                   
                     webDriver = new ChromeDriver(caminhoDriver, options);
 
                     break;
