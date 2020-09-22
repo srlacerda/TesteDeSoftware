@@ -1,21 +1,39 @@
-﻿using OpenQA.Selenium.Chrome;
+﻿using NerdStore.BDD.Tests.Config;
+using OpenQA.Selenium.Chrome;
 using System;
 using TechTalk.SpecFlow;
+using Xunit;
 
 namespace NerdStore.BDD.Tests.Pedido
 {
     [Binding]
+    [CollectionDefinition(nameof(AutomacaoWebFixtureCollection))]
     public class Pedido_AdicionarItemAoCarrinhoSteps
     {
+        private readonly AutomacaoWebTestsFixture _testsFixture;
+        private readonly PedidoTela _pedidoTela;
+        private string _urlProduto;
+
+        public Pedido_AdicionarItemAoCarrinhoSteps(AutomacaoWebTestsFixture testsFixture)
+        {
+            _testsFixture = testsFixture;
+            _pedidoTela = new PedidoTela(testsFixture.BrowserHelper);
+        }
+
         [Given(@"Que um produto esteja na vitrine")]
         public void DadoQueUmProdutoEstejaNaVitrine()
         {
             // Arrange
-            var browser = new ChromeDriver("C:\\WebDriver\\");
-            browser.Navigate().GoToUrl("https://desenvolvedor.io");
+            _pedidoTela.AcessarVitrineDeProdutos();
+
+
             // Act
+            _pedidoTela.ObterDetalhesDoProduto();
+            _urlProduto = _pedidoTela.ObterUrl();
 
             // Assert
+            Assert.True(_pedidoTela.ValidarProdutoDisponivel());
+            
         }
 
         [Given(@"O mesmo produto já tenha sido adicionado ao carrinho anteriormente")]

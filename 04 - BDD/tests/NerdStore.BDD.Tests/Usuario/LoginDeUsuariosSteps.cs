@@ -26,11 +26,11 @@ namespace NerdStore.BDD.Tests.Usuario
             ScenarioContext.Current.Pending();
         }
         
-        [Then(@"Ele será redirecionado para a vitrine")]
-        public void EntaoEleSeraRedirecionadoParaAVitrine()
-        {
-            ScenarioContext.Current.Pending();
-        }
+        //[Then(@"Ele será redirecionado para a vitrine")]
+        //public void EntaoEleSeraRedirecionadoParaAVitrine()
+        //{
+        //    ScenarioContext.Current.Pending();
+        //}
         
 
     }
